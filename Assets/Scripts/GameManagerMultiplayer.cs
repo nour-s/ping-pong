@@ -1,9 +1,10 @@
 using TMPro;
+using Unity.Netcode;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManagerMultiplayer : NetworkBehaviour
 {
-    public static GameManager _instance;
+    public static GameManagerMultiplayer _instance;
     public int speed = 15;
 
     private int _player1Score = 0;
@@ -21,30 +22,48 @@ public class GameManager : MonoBehaviour
 
     public Vector3[] positions;
 
+    // public NetworkManager networkManager;
+
+    public bool isPlayer1Connected;
+
+    private bool serverStarted;
+    private bool clientConnected;
+
+
     void Start()
     {
         _instance = this;
-        ball = Instantiate(_ballPrefab, Vector3.zero, Quaternion.identity);
-        SetBall();
+
+        NetworkManager.OnServerStarted += OnServerStarted;
+        NetworkManager.OnClientConnectedCallback += OnClientConnected;
+        NetworkManager.ConnectionApprovalCallback += ApproveConnection;
+    }
+
+    private void OnClientConnected(ulong obj)
+    {
+        clientConnected = true;
+    }
+
+    private void OnServerStarted()
+    {
+        serverStarted = true;
+    }
+
+    private void ApproveConnection(byte[] payload, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
+    {
+        Debug.Log("Client connected: " + clientId);
+        var position = isPlayer1Connected ? positions[1] : positions[0];
+        isPlayer1Connected = true;
+
+        callback(true, null, true, position, Quaternion.identity);
     }
 
     Vector2 ballPrevPos;
 
     void Update()
     {
-        Vector2 curPos = ball.transform.position;
-        var rb = ball.GetComponent<Rigidbody2D>();
-        var vel = rb.velocity;
+        // if (!NetworkManager.Singleton.IsServer) return;
 
-        // Debug.DrawRay(ballPrevPos.normalized * 10, curPos.normalized, Color.red);
-        // Debug.DrawRay(curPos, vel.normalized * 5, Color.red);
-        lineRenderer.SetPosition(0, curPos);
-        lineRenderer.SetPosition(1, curPos + vel.normalized * 5);
-        lineRenderer.material.mainTextureScale = new Vector2(1f / lineRenderer.startWidth, 1.0f);
-
-        // Vector2 newPosition = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        lineRenderer.material.SetTextureOffset("_MainTex", new Vector2(Time.timeSinceLevelLoad * 4f, 0f));
-        lineRenderer.material.SetTextureScale("_MainTex", new Vector2(curPos.magnitude, 1f));
         // lineRenderer.SetPosition(0, newPosition);
 
         // float dot = Vector2.Dot(curPos.normalized, curPos.normalized * 5);
@@ -74,7 +93,8 @@ public class GameManager : MonoBehaviour
 
     private void SetBall()
     {
-        ball.transform.position = Vector2.zero;
+        if (!NetworkManager.IsServer) return;
+
         var direction =
             new Vector2[] { Vector2.down, Vector2.up }[Random.Range(0, 2)] +
             new Vector2[] { Vector2.right, Vector2.left }[Random.Range(0, 2)];
@@ -93,7 +113,20 @@ public class GameManager : MonoBehaviour
 
     public void StartGame()
     {
+        if (!serverStarted)
+        {
+            Debug.LogError("No server");
+            return;
+        }
+
+        if (!clientConnected)
+        {
+            Debug.LogError("No client");
+            return;
+        }
+
         ball = GameObject.Instantiate(_ballPrefab, Vector3.zero, Quaternion.identity);
         SetBall();
+        ball.GetComponent<NetworkObject>().Spawn();
     }
 }
