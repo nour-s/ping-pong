@@ -23,6 +23,7 @@ public class PlayerSinglePlayer : MonoBehaviour
         {
             var value = Input.GetAxisRaw(axis) * speed * Time.deltaTime;
             transform.position += (Vector3.up * value);
+            transform.position = new Vector3(transform.position.x, Mathf.Clamp(transform.position.y, -6.1f, 6.1f), transform.position.z);
         }
     }
 }
