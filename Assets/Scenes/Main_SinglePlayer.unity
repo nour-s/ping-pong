@@ -154,6 +154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speed: 15
   _scoreText: {fileID: 2086243972}
+  _playerPrefab: {fileID: 5787544063082730769, guid: 9951a84c64a65b74b88001b56651366c, type: 3}
   _ballPrefab: {fileID: 2281819510437454096, guid: a958f79cb75fba8469d96916e02d3b3c, type: 3}
   audioSource: {fileID: 691900924}
   hitSounds:

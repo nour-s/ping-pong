@@ -13,6 +13,7 @@ public class GameManager : MonoBehaviour
 
     public TMP_Text _scoreText;
 
+    public GameObject _playerPrefab;
     public GameObject _ballPrefab;
     public AudioSource audioSource;
     public AudioClip[] hitSounds;
@@ -26,6 +27,14 @@ public class GameManager : MonoBehaviour
         _instance = this;
         ball = Instantiate(_ballPrefab, Vector3.zero, Quaternion.identity);
         SetBall();
+        PlacePlayers();
+    }
+
+    private void PlacePlayers()
+    {
+        var player1 = Instantiate(_playerPrefab, positions[0], Quaternion.identity);
+        var player2 = Instantiate(_playerPrefab, positions[1], Quaternion.identity);
+
     }
 
     Vector2 ballPrevPos;
@@ -38,13 +47,13 @@ public class GameManager : MonoBehaviour
 
         // Debug.DrawRay(ballPrevPos.normalized * 10, curPos.normalized, Color.red);
         // Debug.DrawRay(curPos, vel.normalized * 5, Color.red);
-        lineRenderer.SetPosition(0, curPos);
-        lineRenderer.SetPosition(1, curPos + vel.normalized * 5);
-        lineRenderer.material.mainTextureScale = new Vector2(1f / lineRenderer.startWidth, 1.0f);
+        // lineRenderer.SetPosition(0, curPos);
+        // lineRenderer.SetPosition(1, curPos + vel.normalized * 5);
+        // lineRenderer.material.mainTextureScale = new Vector2(1f / lineRenderer.startWidth, 1.0f);
 
         // Vector2 newPosition = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        lineRenderer.material.SetTextureOffset("_MainTex", new Vector2(Time.timeSinceLevelLoad * 4f, 0f));
-        lineRenderer.material.SetTextureScale("_MainTex", new Vector2(curPos.magnitude, 1f));
+        // lineRenderer.material.SetTextureOffset("_MainTex", new Vector2(Time.timeSinceLevelLoad * 4f, 0f));
+        // lineRenderer.material.SetTextureScale("_MainTex", new Vector2(curPos.magnitude, 1f));
         // lineRenderer.SetPosition(0, newPosition);
 
         // float dot = Vector2.Dot(curPos.normalized, curPos.normalized * 5);
