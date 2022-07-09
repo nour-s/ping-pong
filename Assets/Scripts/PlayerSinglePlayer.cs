@@ -7,6 +7,8 @@ public class PlayerSinglePlayer : MonoBehaviour
 
     public bool isComputer = false;
 
+    public bool isPlayer1 = true;
+
     // Update is called once per frame
     void Update()
     {
@@ -15,9 +17,11 @@ public class PlayerSinglePlayer : MonoBehaviour
             return;
         }
 
-        if (Input.GetAxis("Vertical") != 0)
+        var axis = isPlayer1 ? "Vertical" : "Vertical2";
+
+        if (Input.GetAxis(axis) != 0)
         {
-            var value = Input.GetAxisRaw("Vertical") * speed * Time.deltaTime;
+            var value = Input.GetAxisRaw(axis) * speed * Time.deltaTime;
             transform.position += (Vector3.up * value);
         }
     }
