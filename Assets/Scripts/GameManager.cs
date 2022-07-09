@@ -34,6 +34,7 @@ public class GameManager : MonoBehaviour
     {
         var player1 = Instantiate(_playerPrefab, positions[0], Quaternion.identity);
         var player2 = Instantiate(_playerPrefab, positions[1], Quaternion.identity);
+        player2.GetComponent<PlayerSinglePlayer>().isComputer = true;
 
     }
 

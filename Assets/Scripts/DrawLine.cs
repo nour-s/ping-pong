@@ -1,9 +1,6 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.Netcode;
 using UnityEngine;
 
-public class DrawLine : NetworkBehaviour
+public class DrawLine : MonoBehaviour
 {
     public GameObject lineRendererPrefab;
     private LineRenderer lineRenderer;

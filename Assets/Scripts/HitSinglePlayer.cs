@@ -1,12 +1,10 @@
 using Unity.Netcode;
 using UnityEngine;
 
-public class Hit : NetworkBehaviour
+public class HitSinglePlayer : MonoBehaviour
 {
     void OnTriggerEnter2D(Collider2D other)
     {
-        if ((bool)!NetworkManager?.IsServer) return;
-
         GameManager._instance.PaddleHit(other);
     }
 }

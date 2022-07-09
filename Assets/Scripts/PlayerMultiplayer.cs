@@ -2,7 +2,7 @@ using System;
 using Unity.Netcode;
 using UnityEngine;
 
-public class Player : NetworkBehaviour
+public class PlayerMultiplayer : NetworkBehaviour
 {
     public int speed = 15;
 
