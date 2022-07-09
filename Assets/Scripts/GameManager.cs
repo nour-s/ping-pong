@@ -1,3 +1,4 @@
+using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -26,7 +27,7 @@ public class GameManager : MonoBehaviour
     {
         _instance = this;
         ball = Instantiate(_ballPrefab, Vector3.zero, Quaternion.identity);
-        SetBall();
+        StartCoroutine(SetBall());
         PlacePlayers();
     }
 
@@ -34,7 +35,8 @@ public class GameManager : MonoBehaviour
     {
         var player1 = Instantiate(_playerPrefab, positions[0], Quaternion.identity);
         var player2 = Instantiate(_playerPrefab, positions[1], Quaternion.identity);
-        player2.GetComponent<PlayerSinglePlayer>().isComputer = true;
+        player2.GetComponent<PlayerSinglePlayer>().isPlayer1 = false;
+        // player2.GetComponent<PlayerSinglePlayer>().isComputer = true;
 
     }
 
@@ -42,29 +44,35 @@ public class GameManager : MonoBehaviour
 
     void Update()
     {
+        // DrawPathOfBall();
+
+    }
+
+    private void DrawPathOfBall()
+    {
         Vector2 curPos = ball.transform.position;
         var rb = ball.GetComponent<Rigidbody2D>();
         var vel = rb.velocity;
 
-        // Debug.DrawRay(ballPrevPos.normalized * 10, curPos.normalized, Color.red);
-        // Debug.DrawRay(curPos, vel.normalized * 5, Color.red);
-        // lineRenderer.SetPosition(0, curPos);
-        // lineRenderer.SetPosition(1, curPos + vel.normalized * 5);
-        // lineRenderer.material.mainTextureScale = new Vector2(1f / lineRenderer.startWidth, 1.0f);
+        Debug.DrawRay(ballPrevPos.normalized * 10, curPos.normalized, Color.red);
+        Debug.DrawRay(curPos, vel.normalized * 5, Color.red);
+        lineRenderer.SetPosition(0, curPos);
+        lineRenderer.SetPosition(1, curPos + vel.normalized * 5);
+        lineRenderer.material.mainTextureScale = new Vector2(1f / lineRenderer.startWidth, 1.0f);
 
-        // Vector2 newPosition = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
-        // lineRenderer.material.SetTextureOffset("_MainTex", new Vector2(Time.timeSinceLevelLoad * 4f, 0f));
-        // lineRenderer.material.SetTextureScale("_MainTex", new Vector2(curPos.magnitude, 1f));
-        // lineRenderer.SetPosition(0, newPosition);
+        Vector2 newPosition = (Vector2)Camera.main.ScreenToWorldPoint(Input.mousePosition);
+        lineRenderer.material.SetTextureOffset("_MainTex", new Vector2(Time.timeSinceLevelLoad * 4f, 0f));
+        lineRenderer.material.SetTextureScale("_MainTex", new Vector2(curPos.magnitude, 1f));
+        lineRenderer.SetPosition(0, newPosition);
 
-        // float dot = Vector2.Dot(curPos.normalized, curPos.normalized * 5);
-        // bool sameDirection = dot >= 0;
-        // Debug.LogFormat("dot: {0} ", dot);
+        float dot = Vector2.Dot(curPos.normalized, curPos.normalized * 5);
+        bool sameDirection = dot >= 0;
+        Debug.LogFormat("dot: {0} ", dot);
 
-        // if (!sameDirection)
-        // {
-        //     ballPrevPos = curPos;
-        // }
+        if (!sameDirection)
+        {
+            ballPrevPos = curPos;
+        }
     }
 
     internal void GoalHit(bool isPlayer1)
@@ -72,9 +80,10 @@ public class GameManager : MonoBehaviour
         _ = isPlayer1 ? _player1Score++ : _player2Score++;
 
         audioSource.PlayOneShot(loseSounds[Random.Range(0, loseSounds.Length)]);
+        ball.SetActive(false);
 
         UpdateText();
-        SetBall();
+        StartCoroutine(SetBall());
     }
 
     private void UpdateText()
@@ -82,8 +91,10 @@ public class GameManager : MonoBehaviour
         _scoreText.text = _player1Score + " - " + _player2Score;
     }
 
-    private void SetBall()
+    private IEnumerator SetBall()
     {
+        yield return new WaitForSeconds(3f);
+        ball.SetActive(true);
         ball.transform.position = Vector2.zero;
         var direction =
             new Vector2[] { Vector2.down, Vector2.up }[Random.Range(0, 2)] +
