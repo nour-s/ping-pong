@@ -117,4 +117,12 @@ public class GameManager : MonoBehaviour
         ball = GameObject.Instantiate(_ballPrefab, Vector3.zero, Quaternion.identity);
         SetBall();
     }
+
+    internal void WallHit(Collider2D other)
+    {
+        if (other.CompareTag("Ball"))
+        {
+            audioSource.PlayOneShot(hitSounds[Random.Range(0, hitSounds.Length)]);
+        }
+    }
 }
